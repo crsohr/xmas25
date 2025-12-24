@@ -25,7 +25,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+
+      - name: Set VITE_BASE from repo name
+        # GITHUB_REPOSITORY = owner/repo -> we extract the repo segment and add leading/trailing slashes
+        run: |
+          echo "VITE_BASE=/${GITHUB_REPOSITORY#*/}/" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
@@ -38,7 +42,11 @@ jobs:
           fi
 
       - name: Build
+        # VITE_BASE is now available to Vite via process.env / loadEnv
         run: npm run build
+        env:
+          # optional: explicit passthrough, but not strictly necessary since $GITHUB_ENV exports it
+          VITE_BASE: ${{ env.VITE_BASE }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
