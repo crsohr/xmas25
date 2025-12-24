@@ -1,7 +1,3 @@
-# Build & deploy Vite (React) app to GitHub Pages
-# - installs dependencies
-# - runs `npm run build` (uses the repo's "build" script which is "vite build")
-# - uploads ./dist as the Pages artifact and deploys it
 name: Build and deploy Vite site to GitHub Pages
 
 on:
@@ -32,7 +28,14 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ] || [ -f yarn.lock ]; then
+            echo "Lockfile found — using npm ci"
+            npm ci
+          else
+            echo "No lockfile found — using npm install"
+            npm install
+          fi
 
       - name: Build
         run: npm run build
@@ -48,4 +51,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4npm 
